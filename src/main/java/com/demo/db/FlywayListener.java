@@ -26,6 +26,7 @@ public class FlywayListener implements ServletContextListener {
 
             Flyway flyway = Flyway.configure()
                 .dataSource(url, user, password)
+                .baselineOnMigrate(true)
                 .load();
             
             flyway.migrate();

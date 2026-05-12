@@ -12,5 +12,5 @@ INSERT INTO accounts (account_number, account_name, balance) VALUES
 -- Note: In a real system, you would hash these during a setup phase.
 -- This hash is for 'Password123!@#'
 INSERT INTO users (username, password, role) VALUES 
-('admin_test', '$2a$12$Xy/F0L8l8p2o/v.1w6v5.eG7zYf4.eO1uYnZ/7q8uE9iO8e1uYnZ/', 'CHECKER'),
-('maker1', '$2a$12$Xy/F0L8l8p2o/v.1w6v5.eG7zYf4.eO1uYnZ/7q8uE9iO8e1uYnZ/', 'MAKER');
+('admin_test', '$2a$12$grKfguheB5f6KIUW7teGuOlQNxECeQ93JLLh.W89ifQ40jU2MVD5q', 'CHECKER'),
+('maker1', '$2a$12$grKfguheB5f6KIUW7teGuOlQNxECeQ93JLLh.W89ifQ40jU2MVD5q', 'MAKER');
