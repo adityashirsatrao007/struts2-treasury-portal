@@ -6,7 +6,7 @@ services:
     region: ohio
     envVars:
       - key: PORT
-        value: 10000
+        value: 7860
       - key: STRUTS_DEV_MODE
         value: "true"
       - key: DATABASE_URL

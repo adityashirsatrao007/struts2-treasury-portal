@@ -33,9 +33,9 @@ RUN chown -R tomcat:tomcat /usr/local/tomcat
 # Copy the built WAR
 COPY --from=build --chown=tomcat:tomcat /app/target/struts2-demo.war /usr/local/tomcat/webapps/ROOT.war
 
-# Configure Tomcat to listen on 10000
-RUN sed -i 's/port="8080"/port="10000"/g' /usr/local/tomcat/conf/server.xml
+# Configure Tomcat to listen on 7860 (Hugging Face default)
+RUN sed -i 's/port="10000"/port="7860"/g' /usr/local/tomcat/conf/server.xml
 
 USER tomcat
-EXPOSE 10000
+EXPOSE 7860
 CMD ["catalina.sh", "run"]
