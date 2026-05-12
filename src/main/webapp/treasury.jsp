@@ -37,7 +37,10 @@
             <h1 style="font-size: 1.5rem;">J.P. Morgan <span style="font-weight: 300; color: #aaa;">| Treasury Portal</span></h1>
         </div>
         <div>
-            <span>Welcome, <strong><s:property value="#session.user" /></strong> (<s:property value="currentUserRole" />)</span> | 
+            <span>User: <strong><s:property value="#session.user" /></strong></span> | 
+            <span style="background: #58a6ff; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; margin: 0 10px;">
+                ROLE: <s:property value="currentUserRole" />
+            </span> |
             <a href="logout.action" class="logout">Secure Logout</a>
         </div>
     </header>
@@ -52,7 +55,7 @@
             </s:if>
         </div>
 
-        <!-- Liquidity Overview -->
+        <!-- Liquidity Overview (Visible to All) -->
         <div class="card">
             <h2>Liquidity Overview</h2>
             <table>
@@ -75,69 +78,96 @@
             </table>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-            <!-- Initiate Transfer (Maker) -->
-            <div class="card" <s:if test="currentUserRole != 'MAKER'">style="opacity: 0.6; pointer-events: none;"</s:if>>
-                <h2>Initiate Fund Transfer <s:if test="currentUserRole != 'MAKER'"><span style="font-size: 0.8rem; color: var(--danger);">(Maker Only)</span></s:if></h2>
-                <form action="initiateTransfer" method="post">
-                    <div class="form-group">
-                        <label>From Account</label>
-                        <select name="fromAccount">
-                            <s:iterator value="accounts">
-                                <option value="<s:property value='accountNumber' />"><s:property value="accountName" /> (<s:property value="accountNumber" />)</option>
-                            </s:iterator>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Destination Account Number</label>
-                        <input type="text" name="toAccount" placeholder="Enter Account Number" required />
-                    </div>
-                    <div class="form-group">
-                        <label>Amount (USD)</label>
-                        <input type="number" name="amount" step="0.01" min="1" placeholder="0.00" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary" <s:if test="currentUserRole != 'MAKER'">disabled</s:if>>Initiate Maker Request</button>
-                </form>
-            </div>
+        <!-- ROLE-SPECIFIC DASHBOARD CONTENT -->
+        <div style="display: grid; grid-template-columns: 1fr; gap: 2rem;">
+            
+            <!-- MAKER SECTION: Initiates transfers -->
+            <s:if test="currentUserRole != null && currentUserRole.toUpperCase().equals('MAKER')">
+                <div class="card" style="border-left: 5px solid var(--jpmc-blue);">
+                    <h2 style="display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">💸</span> Initiate New Fund Transfer
+                    </h2>
+                    <p style="color: #666; margin-bottom: 1.5rem;">Create a secure payment instruction for authorized approval.</p>
+                    
+                    <form action="initiateTransfer" method="post">
+                        <div class="form-group">
+                            <label>Source Liquidity Account</label>
+                            <select name="fromAccount" style="padding: 12px; border: 1px solid #ccc; background: #fff;">
+                                <s:iterator value="accounts">
+                                    <option value="<s:property value='accountNumber' />"><s:property value="accountName" /> (<s:property value="accountNumber" />)</option>
+                                </s:iterator>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Beneficiary Account Number</label>
+                            <input type="text" name="toAccount" placeholder="Ex: ACC-JPMC-XXX" required style="padding: 12px; border: 1px solid #ccc;" />
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Amount (USD)</label>
+                            <input type="number" name="amount" step="0.01" min="1" placeholder="0.00" required style="padding: 12px; border: 1px solid #ccc;" />
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            Submit Instruction for Authorization
+                        </button>
+                    </form>
+                </div>
+            </s:if>
 
-            <!-- Pending Approvals (Checker) -->
-            <div class="card">
-                <h2>Pending Approvals</h2>
-                <s:if test="pendingTransfers.isEmpty()">
-                    <p style="color: #666; text-align: center; padding: 2rem;">No pending requests at this time.</p>
-                </s:if>
-                <s:else>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Amount</th>
-                                <th>Initiator</th>
-                                <s:if test="currentUserRole == 'CHECKER'">
+            <!-- CHECKER SECTION: Approves transfers -->
+            <s:if test="currentUserRole != null && currentUserRole.toUpperCase().equals('CHECKER')">
+                <div class="card" style="border-left: 5px solid var(--success);">
+                    <h2 style="display: flex; align-items: center;">
+                        <span style="margin-right: 10px;">⚖️</span> Pending Authorization Queue
+                    </h2>
+                    <p style="color: #666; margin-bottom: 1.5rem;">Review and sign-off on pending liquidity movements.</p>
+                    
+                    <s:if test="pendingTransfers.isEmpty()">
+                        <div style="text-align: center; padding: 4rem; background: #fdfdfd; border: 1px dashed #eee; border-radius: 12px;">
+                            <p style="color: #aaa; font-style: italic;">No pending payment instructions found.</p>
+                        </div>
+                    </s:if>
+                    <s:else>
+                        <table>
+                            <thead>
+                                <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                                    <th>Ref ID</th>
+                                    <th>From Account</th>
+                                    <th>To Account</th>
+                                    <th>Amount</th>
+                                    <th>Maker</th>
                                     <th>Action</th>
-                                </s:if>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <s:iterator value="pendingTransfers">
-                                <tr>
-                                    <td>#<s:property value="id" /></td>
-                                    <td>$ <s:property value="amount" /></td>
-                                    <td><s:property value="initiator" /></td>
-                                    <s:if test="currentUserRole == 'CHECKER'">
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <s:iterator value="pendingTransfers">
+                                    <tr>
+                                        <td>#<s:property value="id" /></td>
+                                        <td><s:property value="fromAccount" /></td>
+                                        <td><s:property value="toAccount" /></td>
+                                        <td style="font-weight: bold; color: var(--danger);">$ <s:property value="amount" /></td>
+                                        <td><s:property value="initiator" /></td>
                                         <td>
                                             <form action="approveTransfer" method="post" style="display:inline;">
                                                 <input type="hidden" name="transferId" value="<s:property value='id' />" />
-                                                <button type="submit" class="btn btn-success" style="padding: 5px 10px; font-size: 0.8rem;">Approve</button>
+                                                <button type="submit" class="btn btn-success" style="padding: 10px 20px; font-size: 0.9rem;">Authorize Payment</button>
                                             </form>
                                         </td>
-                                    </s:if>
-                                </tr>
-                            </s:iterator>
-                        </tbody>
-                    </table>
-                </s:else>
-            </div>
+                                    </tr>
+                                </s:iterator>
+                            </tbody>
+                        </table>
+                    </s:else>
+                </div>
+            </s:if>
+
+            <!-- NO ROLE DETECTED -->
+            <s:if test="currentUserRole == null">
+                <div class="card" style="border: 2px solid var(--danger); background: #fff5f5; text-align: center; padding: 3rem;">
+                    <h2 style="color: var(--danger); margin-bottom: 1rem;">Session Desynchronized</h2>
+                    <p>The secure portal could not verify your permission level in real-time. Please re-authenticate to restore full access.</p>
+                    <a href="logout.action" class="btn btn-danger" style="display: inline-block; margin-top: 1.5rem; text-decoration: none;">Secure Logout & Re-Login</a>
+                </div>
+            </s:if>
         </div>
     </div>
 </body>

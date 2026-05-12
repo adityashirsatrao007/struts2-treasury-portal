@@ -3,10 +3,12 @@ package com.demo.action;
 import com.demo.db.HibernateUtil;
 import com.demo.model.Account;
 import com.demo.model.Transfer;
+import com.demo.model.User;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.hibernate.Session;
@@ -38,7 +40,6 @@ public class TreasuryAction extends ActionSupport {
     @Action("/treasury")
     public String execute() {
         String format = ServletActionContext.getRequest().getParameter("format");
-        currentUserRole = (String) ServletActionContext.getContext().getSession().get("role");
         loadData();
         return "json".equals(format) ? "json" : SUCCESS;
     }
@@ -46,11 +47,18 @@ public class TreasuryAction extends ActionSupport {
     @Action("/initiateTransfer")
     public String initiate() {
         String format = ServletActionContext.getRequest().getParameter("format");
+        loadData();
+        if (!"MAKER".equals(currentUserRole)) {
+            apiSuccess = false;
+            apiMessage = "SECURITY ALERT: Only Makers can initiate transfers.";
+            addActionError(apiMessage);
+            return "json".equals(format) ? "json" : ERROR;
+        }
+
         if (amount <= 0) {
             apiSuccess = false;
             apiMessage = "Amount must be greater than zero.";
             addActionError(apiMessage);
-            loadData();
             return "json".equals(format) ? "json" : ERROR;
         }
 
@@ -87,6 +95,14 @@ public class TreasuryAction extends ActionSupport {
     @Action("/approveTransfer")
     public String approve() {
         String format = ServletActionContext.getRequest().getParameter("format");
+        loadData();
+        if (!"CHECKER".equals(currentUserRole)) {
+            apiSuccess = false;
+            apiMessage = "SECURITY ALERT: Only Checkers can approve transfers.";
+            addActionError(apiMessage);
+            return "json".equals(format) ? "json" : ERROR;
+        }
+
         String username = (String) ServletActionContext.getContext().getSession().get("user");
 
         Transaction transaction = null;
@@ -138,7 +154,22 @@ public class TreasuryAction extends ActionSupport {
     }
 
     private void loadData() {
+        String username = (String) ServletActionContext.getContext().getSession().get("user");
+        currentUserRole = (String) ServletActionContext.getContext().getSession().get("role");
+        
+        System.out.println("--- DEBUG: TreasuryAction for " + username + " role is " + currentUserRole + " ---");
+
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            // Fallback: If role is lost in session, reload from DB
+            if (currentUserRole == null && username != null) {
+                User user = session.get(User.class, username);
+                if (user != null) {
+                    currentUserRole = user.getRole();
+                    ServletActionContext.getContext().getSession().put("role", currentUserRole);
+                    System.out.println("--- DEBUG: Role recovered from DB: " + currentUserRole + " ---");
+                }
+            }
+            
             accounts = session.createQuery("from Account", Account.class).list();
             pendingTransfers = session.createQuery("from Transfer where status = 'PENDING'", Transfer.class).list();
         } catch (Exception e) {

@@ -7,7 +7,13 @@
     <constant name="struts.devMode" value="true" />
     <constant name="struts.ui.theme" value="simple" />
 
-    <package name="auth-default" extends="json-default">
+    <!-- Public Actions (Login/Register) -->
+    <package name="public" extends="json-default" namespace="/">
+        <default-interceptor-ref name="defaultStack"/>
+    </package>
+
+    <!-- Secure Actions (Treasury/Transfers) -->
+    <package name="auth-default" extends="json-default" namespace="/">
         <interceptors>
             <interceptor name="auth" class="com.demo.interceptor.AuthenticationInterceptor"/>
             <interceptor name="audit" class="com.demo.interceptor.AuditInterceptor"/>

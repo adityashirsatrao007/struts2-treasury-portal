@@ -9,7 +9,10 @@ import org.apache.struts2.convention.annotation.Results;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.mindrot.jbcrypt.BCrypt;
+import org.apache.struts2.convention.annotation.ParentPackage;
+import org.apache.struts2.convention.annotation.InterceptorRef;
 
+@ParentPackage("public")
 @Results({
     @Result(name = "success", type = "redirect", location = "login.jsp"),
     @Result(name = "input", location = "/register.jsp"),

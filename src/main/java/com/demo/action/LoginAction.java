@@ -12,8 +12,7 @@ import org.apache.struts2.convention.annotation.Results;
 import org.hibernate.Session;
 import org.mindrot.jbcrypt.BCrypt;
 
-@ParentPackage("auth-default")
-@InterceptorRef("defaultStack")
+@ParentPackage("public")
 @Results({
     @Result(name = "success", type = "redirect", location = "treasury.action"),
     @Result(name = "input", location = "/login.jsp"),
@@ -61,7 +60,7 @@ public class LoginAction extends ActionSupport {
 
     @Action("/logout")
     public String logout() {
-        ServletActionContext.getContext().getSession().remove("user");
+        ServletActionContext.getContext().getSession().clear();
         return INPUT;
     }
 
