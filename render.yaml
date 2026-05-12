@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: struts2-treasury-portal
+    runtime: docker
+    plan: free
+    region: ohio
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: STRUTS_DEV_MODE
+        value: "true"
+    healthCheckPath: /login.jsp
