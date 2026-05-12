@@ -13,6 +13,7 @@ import org.hibernate.Session;
 import org.mindrot.jbcrypt.BCrypt;
 
 @ParentPackage("public")
+@InterceptorRef("publicStack")
 @Results({
     @Result(name = "success", type = "redirect", location = "treasury.action"),
     @Result(name = "input", location = "/login.jsp"),
@@ -37,7 +38,7 @@ public class LoginAction extends ActionSupport {
 
             if (user != null) {
                 // Verify the hashed password
-                if (BCrypt.checkpw(password, user.getPassword())) {
+                if (com.demo.security.PasswordUtils.verifyPassword(password, user.getPassword())) {
                     ServletActionContext.getContext().getSession().put("user", username);
                     ServletActionContext.getContext().getSession().put("role", user.getRole());
                     apiSuccess = true;

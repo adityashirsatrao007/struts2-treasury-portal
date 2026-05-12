@@ -11,15 +11,22 @@ buildNumber.properties
 .mvn/wrapper/maven-wrapper.jar
 
 # IDEs
+# IDE
 .idea/
 *.iml
-.vscode/
+
+# Environment
+.env
+.env.local
+
+# Databases & Logs
+# Database
+testdb.*
 .project
 .classpath
 .settings/
 *.sublime-project
 *.sublime-workspace
-
 # Databases & Logs
 *.db
 *.trace.db

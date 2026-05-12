@@ -1,7 +1,19 @@
 import requests
 import json
 import sys
+import os
 
+# Load .env if available
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
+
+BASE_URL = os.getenv("BASE_URL", "http://localhost:8080")
+TEST_USERNAME = os.getenv("TEST_USERNAME", "admin_test")
+TEST_PASSWORD = os.getenv("TEST_PASSWORD", "Password123!@#")
+SESSION = requests.Session()
 BASE_URL = "http://localhost:8080"
 SESSION = requests.Session()
 
@@ -73,9 +85,9 @@ def test_approve_transfer(transfer_id):
 
 if __name__ == "__main__":
     # Ensure a fresh user exists
-    test_register("admin_test", "password123")
+    test_register(TEST_USERNAME, TEST_PASSWORD)
     
-    if not test_login("admin_test", "password123"):
+    if not test_login(TEST_USERNAME, TEST_PASSWORD):
         sys.exit(1)
     
     dashboard = test_get_dashboard()

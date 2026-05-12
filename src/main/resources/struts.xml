@@ -17,9 +17,17 @@
         <interceptors>
             <interceptor name="auth" class="com.demo.interceptor.AuthenticationInterceptor"/>
             <interceptor name="audit" class="com.demo.interceptor.AuditInterceptor"/>
+            <interceptor name="securityHeaders" class="com.demo.interceptor.SecurityHeadersInterceptor"/>
+            
             <interceptor-stack name="authStack">
+                <interceptor-ref name="securityHeaders"/>
                 <interceptor-ref name="audit"/>
                 <interceptor-ref name="auth"/>
+                <interceptor-ref name="defaultStack"/>
+            </interceptor-stack>
+
+            <interceptor-stack name="publicStack">
+                <interceptor-ref name="securityHeaders"/>
                 <interceptor-ref name="defaultStack"/>
             </interceptor-stack>
         </interceptors>
@@ -28,6 +36,13 @@
 
         <global-results>
             <result name="login" type="redirect">login.jsp</result>
+            <result name="error">/error.jsp</result>
+            <result name="unauthorized">/error.jsp</result>
         </global-results>
+
+        <global-exception-mappings>
+            <exception-mapping exception="java.lang.Exception" result="error"/>
+            <exception-mapping exception="java.lang.SecurityException" result="unauthorized"/>
+        </global-exception-mappings>
     </package>
 </struts>

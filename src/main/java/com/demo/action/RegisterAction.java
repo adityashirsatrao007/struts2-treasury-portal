@@ -13,6 +13,7 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.InterceptorRef;
 
 @ParentPackage("public")
+@InterceptorRef("publicStack")
 @Results({
     @Result(name = "success", type = "redirect", location = "login.jsp"),
     @Result(name = "input", location = "/register.jsp"),
@@ -34,8 +35,14 @@ public class RegisterAction extends ActionSupport {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             
+            // Validate Strength
+            if (!com.demo.security.PasswordUtils.isStrong(password)) {
+                addActionError("Password must be 12+ chars, include Uppercase, Lowercase, Number, and Special Character!");
+                return ERROR;
+            }
+
             // Hash the password
-            String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+            String hashedPassword = com.demo.security.PasswordUtils.hashPassword(password);
             
             User user = new User(username, hashedPassword, role != null ? role : "MAKER");
             session.persist(user);

@@ -10,12 +10,15 @@ An enterprise-grade **Corporate Treasury Management System** built with **Apache
 - **Enterprise Security:** BCrypt password hashing and session-based authentication.
 
 ## 🛠 Tech Stack
-- **Framework:** Struts 2.6 (Convention Plugin)
+- **Framework:** Struts 2.6.3.0.2 (Convention Plugin)
 - **Database Layer:** Hibernate 6.2 + H2 (Oracle/PostgreSQL ready)
-- **Logging:** Log4j2 (Structured Logging)
+- **Connection Pool:** HikariCP (High Performance)
+- **Migrations:** Flyway (Versioned Database Schema)
+- **Logging:** Log4j2 (Rolling Audit/Security Logs)
 - **Server:** Apache Tomcat 9/10
-- **Testing:** Python 3 (CLI API Testing)
-- **Infrastructure:** Dockerized for Cloud Deployment (Railway/Render)
+- **Testing:** JUnit 5, Mockito, Python 3 (CLI API Testing)
+- **Infrastructure:** Dockerized with Security Hardening (Non-root user)
+- **Environment Management:** .env based configuration
 
 ## 📦 Getting Started
 
