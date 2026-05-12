@@ -41,4 +41,6 @@ public class ApprovalAction extends ActionSupport {
     public void setTransferId(int transferId) { this.transferId = transferId; }
     public boolean isApiSuccess() { return apiSuccess; }
     public String getApiMessage() { return apiMessage; }
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
 }

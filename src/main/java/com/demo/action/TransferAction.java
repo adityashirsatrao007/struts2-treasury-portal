@@ -47,4 +47,6 @@ public class TransferAction extends ActionSupport {
     public void setAmount(double amount) { this.amount = amount; }
     public boolean isApiSuccess() { return apiSuccess; }
     public String getApiMessage() { return apiMessage; }
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
 }

@@ -77,6 +77,8 @@
         <div class="sidebar-logo">J.P. Morgan<span>.</span></div>
         <div class="nav-menu">
             <a href="treasury.action" class="nav-item active"><i>🏠</i> Dashboard</a>
+            <a href="reports.action" class="nav-item"><i>📊</i> Liquidity Reports</a>
+            <a href="audit.action" class="nav-item"><i>⚖️</i> Audit Logs</a>
             <s:if test="currentUserRole.equals('MAKER')">
                 <a href="#initiate" class="nav-item"><i>💸</i> Initiate Transfer</a>
                 <a href="#pending" class="nav-item"><i>⏳</i> Pending Approvals</a>
@@ -84,7 +86,6 @@
             <s:if test="currentUserRole.equals('CHECKER')">
                 <a href="#queue" class="nav-item"><i>⚖️</i> Authorization Queue</a>
             </s:if>
-            <a href="#" class="nav-item"><i>📊</i> Liquidity Reports</a>
             <a href="#" class="nav-item"><i>⚙️</i> Settings</a>
         </div>
         <a href="logout.action" class="nav-item" style="margin-top: auto; color: #ef4444;"><i>🚪</i> Sign Out</a>

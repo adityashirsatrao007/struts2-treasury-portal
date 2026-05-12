@@ -19,20 +19,24 @@ public class AuditInterceptor extends AbstractInterceptor {
         
         if (username == null) username = "System/Anonymous";
 
-        logAction(username, "REQUEST", actionName + "." + methodName);
-        String result = invocation.invoke();
-        logAction(username, "RESULT", actionName + " returned " + result);
-
-        return result;
+        // Only log specific actions to avoid recursion or session issues
+        if (!actionName.equals("audit")) {
+            logAction(username, "REQUEST", actionName + "." + methodName);
+        }
+        
+        return invocation.invoke();
     }
 
     private void logAction(String username, String action, String details) {
         try {
-            Session session = HibernateUtil.getCurrentSession();
-            AuditLog log = new AuditLog(username, action, details);
-            session.persist(log);
+            Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+            if (session != null && session.isOpen()) {
+                AuditLog log = new AuditLog(username, action, details);
+                session.save(log);
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            // Log to console if DB logging fails to avoid crashing the app
+            System.err.println("Audit Log Failed: " + details);
         }
     }
 }

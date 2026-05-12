@@ -7,11 +7,11 @@ public class RegisterAction extends ActionSupport {
     private String username;
     private String password;
     private String role;
+    private String format;
 
     private final AuthenticationService authService = new AuthenticationService();
 
     public String execute() {
-        String format = org.apache.struts2.ServletActionContext.getRequest().getParameter("format");
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             addActionError("Username and Password are required!");
             return "json".equals(format) ? "json" : ERROR;
@@ -35,4 +35,6 @@ public class RegisterAction extends ActionSupport {
     public void setPassword(String password) { this.password = password; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+    public String getFormat() { return format; }
+    public void setFormat(String format) { this.format = format; }
 }

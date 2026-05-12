@@ -1,39 +1,30 @@
-# Maven
+# Java / Maven
 target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+*.class
+*.war
+*.ear
+*.jar
 
 # IDEs
-# IDE
 .idea/
 *.iml
-
-# Environment
-.env
-.env.local
-
-# Databases & Logs
-# Database
-testdb.*
 .project
-.classpath
 .settings/
-*.sublime-project
-*.sublime-workspace
-# Databases & Logs
-*.db
-*.trace.db
-testdb.*
-logs/
-*.log
+.classpath
+.factorypath
 
-# OS
+# OS / Misc
 .DS_Store
 Thumbs.db
+*.log
+tmp/
+temp/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+
+# Database
+testdb.*
+*.db
