@@ -1,9 +1,9 @@
 package com.demo.db;
 
 import org.flywaydb.core.Flyway;
-import jakarta.servlet.ServletContextEvent;
-import jakarta.servlet.ServletContextListener;
-import jakarta.servlet.annotation.WebListener;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 import java.net.URI;
 
 @WebListener
