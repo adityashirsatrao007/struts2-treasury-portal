@@ -26,13 +26,13 @@ public class HibernateSessionInterceptor extends AbstractInterceptor {
             
             String result = invocation.invoke();
             
-            if (transaction.getStatus().canCommit()) {
+            if (transaction.isActive()) {
                 transaction.commit();
             }
             return result;
             
         } catch (Exception e) {
-            if (transaction != null && transaction.getStatus().canCommit()) {
+            if (transaction != null && transaction.isActive()) {
                 transaction.rollback();
             }
             throw e;
