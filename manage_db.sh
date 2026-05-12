@@ -4,6 +4,9 @@ H2_JAR="/home/aditya/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar"
 JDBC_URL="jdbc:h2:./testdb;AUTO_SERVER=TRUE"
 USER="sa"
 
+# Real BCrypt hash for 'password123'
+HASH='$2a$10$0TCN5Y.sPiTuMSrHFXgE2uf3lsXdsp1Q2Dql3PlF02XVd5lgRwzoS'
+
 if [ "$1" == "seed" ]; then
     echo "--- SEEDING JPMC TREASURY DATABASE ---"
     java -cp "$H2_JAR" org.h2.tools.Shell -url "$JDBC_URL" -user "$USER" -sql "
@@ -21,10 +24,9 @@ if [ "$1" == "seed" ]; then
         INSERT INTO accounts (account_number, account_name, balance) VALUES ('ACC-JPMC-002', 'Strategic Reserve Account', 5000000.00);
         INSERT INTO accounts (account_number, account_name, balance) VALUES ('ACC-JPMC-003', 'Payroll Account', 250000.00);
         
-        -- Password for all is 'password123'
-        INSERT INTO users (username, password, role) VALUES ('maker1', '\$2a\$10\$8.UnVuG9shgYdfiS.r6zK.qj/S/p3A.HlZ6p.R.e.P/q.q.q.q.q.q.', 'MAKER');
-        INSERT INTO users (username, password, role) VALUES ('checker1', '\$2a\$10\$8.UnVuG9shgYdfiS.r6zK.qj/S/p3A.HlZ6p.R.e.P/q.q.q.q.q.q.', 'CHECKER');
-        INSERT INTO users (username, password, role) VALUES ('admin', '\$2a\$10\$8.UnVuG9shgYdfiS.r6zK.qj/S/p3A.HlZ6p.R.e.P/q.q.q.q.q.q.', 'CHECKER');
+        INSERT INTO users (username, password, role) VALUES ('maker1', '$HASH', 'MAKER');
+        INSERT INTO users (username, password, role) VALUES ('checker1', '$HASH', 'CHECKER');
+        INSERT INTO users (username, password, role) VALUES ('admin', '$HASH', 'CHECKER');
 
         INSERT INTO audit_logs (username, action, details) VALUES ('System', 'INITIALIZATION', 'Treasury System Environment Ready');
     "
