@@ -11,7 +11,14 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Phase 2: Secure Runtime
-FROM tomcat:10.1-jdk21-temurin
+FROM tomcat:9.0-jdk21-temurin
+
+# Set JVM options for Java 21 compatibility with legacy Struts/Tomcat
+ENV CATALINA_OPTS="--add-opens=java.base/java.lang=ALL-UNNAMED \
+                   --add-opens=java.base/java.io=ALL-UNNAMED \
+                   --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
+                   --add-opens=java.base/java.util=ALL-UNNAMED \
+                   --add-opens=java.base/sun.nio.ch=ALL-UNNAMED"
 
 # Remove default webapps for security
 RUN rm -rf /usr/local/tomcat/webapps/*
