@@ -1,91 +1,85 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE struts PUBLIC
-    "-//Apache Software Foundation//DTD Struts Configuration 6.0//EN"
-    "http://struts.apache.org/dtds/struts-6.0.dtd">
+        "-//Apache Software Foundation//DTD Struts Configuration 6.0//EN"
+        "http://struts.apache.org/dtds/struts-6.0.dtd">
 
 <struts>
+    <!-- Dev Mode for better debugging -->
     <constant name="struts.devMode" value="true" />
-    <constant name="struts.ui.theme" value="simple" />
-    <constant name="struts.convention.action.packages" value="com.demo.action" />
-    <constant name="struts.action.extension" value="action,," />
-    <constant name="struts.enable.DynamicMethodInvocation" value="false" />
-
-    <!-- Base Package for Interceptors -->
-    <package name="base" extends="json-default" abstract="true">
+    <constant name="struts.action.extension" value="action,,"/>
+    <constant name="struts.enable.DynamicMethodInvocation" value="false"/>
+    
+    <!-- Package for all Treasury Portal actions (extending json-default for API support) -->
+    <package name="treasury-portal" extends="json-default" namespace="/">
+        
+        <!-- Custom Interceptors -->
         <interceptors>
-            <interceptor name="auth" class="com.demo.interceptor.AuthenticationInterceptor"/>
-            <interceptor name="audit" class="com.demo.interceptor.AuditInterceptor"/>
-            <interceptor name="securityHeaders" class="com.demo.interceptor.SecurityHeadersInterceptor"/>
+            <interceptor name="authentication" class="com.demo.interceptor.AuthenticationInterceptor"/>
             <interceptor name="hibernateSession" class="com.demo.interceptor.HibernateSessionInterceptor"/>
             
-            <interceptor-stack name="authStack">
+            <interceptor-stack name="portalStack">
                 <interceptor-ref name="hibernateSession"/>
-                <interceptor-ref name="securityHeaders"/>
-                <interceptor-ref name="audit"/>
-                <interceptor-ref name="auth"/>
                 <interceptor-ref name="defaultStack"/>
             </interceptor-stack>
 
-            <interceptor-stack name="publicStack">
+            <interceptor-stack name="secureStack">
                 <interceptor-ref name="hibernateSession"/>
-                <interceptor-ref name="securityHeaders"/>
+                <interceptor-ref name="authentication"/>
                 <interceptor-ref name="defaultStack"/>
             </interceptor-stack>
         </interceptors>
 
-        <global-results>
-            <result name="login" type="redirect">login.jsp</result>
-            <result name="error">/error.jsp</result>
-            <result name="unauthorized">/error.jsp</result>
-        </global-results>
+        <!-- Default configurations -->
+        <default-interceptor-ref name="portalStack"/>
+        <default-action-ref name="index"/>
 
-        <global-exception-mappings>
-            <exception-mapping exception="java.lang.Exception" result="error"/>
-            <exception-mapping exception="java.lang.SecurityException" result="unauthorized"/>
-        </global-exception-mappings>
-    </package>
+        <!-- Public Actions -->
+        <action name="index">
+            <result type="redirect">login.action</result>
+        </action>
 
-    <!-- Public Actions (Login/Register) -->
-    <package name="public" extends="base" namespace="/">
-        <default-interceptor-ref name="publicStack"/>
-        
         <action name="login" class="com.demo.action.LoginAction">
             <result name="success" type="redirect">treasury.action</result>
             <result name="input">/WEB-INF/content/login.jsp</result>
             <result name="error">/WEB-INF/content/login.jsp</result>
+            <result name="json" type="json"></result>
         </action>
-        
+
         <action name="logout" class="com.demo.action.LoginAction" method="logout">
             <result name="success">/WEB-INF/content/login.jsp</result>
+            <result name="json" type="json"></result>
         </action>
 
         <action name="register" class="com.demo.action.RegisterAction">
             <result name="success" type="redirect">login.action</result>
             <result name="input">/WEB-INF/content/register.jsp</result>
-        </action>
-        
-        <action name="index">
-            <result type="redirect">login.action</result>
-        </action>
-    </package>
-
-    <!-- Secure Actions (Treasury/Transfers) -->
-    <package name="auth-default" extends="base" namespace="/">
-        <default-interceptor-ref name="authStack"/>
-        
-        <action name="treasury" class="com.demo.action.TreasuryAction">
-            <result name="success">/WEB-INF/content/treasury.jsp</result>
+            <result name="error">/WEB-INF/content/register.jsp</result>
             <result name="json" type="json"></result>
         </action>
-        
+
+        <!-- Secure Actions (Require login) -->
+        <action name="treasury" class="com.demo.action.TreasuryAction">
+            <interceptor-ref name="secureStack"/>
+            <result name="success">/WEB-INF/content/treasury.jsp</result>
+            <result name="json" type="json"></result>
+            <result name="login" type="redirect">login.action</result>
+        </action>
+
         <action name="initiateTransfer" class="com.demo.action.TransferAction">
+            <interceptor-ref name="secureStack"/>
             <result name="success" type="redirect">treasury.action</result>
             <result name="error">/WEB-INF/content/treasury.jsp</result>
+            <result name="json" type="json"></result>
+            <result name="login" type="redirect">login.action</result>
         </action>
-        
+
         <action name="approveTransfer" class="com.demo.action.ApprovalAction">
+            <interceptor-ref name="secureStack"/>
             <result name="success" type="redirect">treasury.action</result>
             <result name="error">/WEB-INF/content/treasury.jsp</result>
+            <result name="json" type="json"></result>
+            <result name="login" type="redirect">login.action</result>
         </action>
+
     </package>
 </struts>

@@ -18,6 +18,7 @@ public class LoginAction extends ActionSupport {
     @Override
     public String execute() {
         String format = ServletActionContext.getRequest().getParameter("format");
+        System.out.println("--- LoginAction: format=" + format + ", user=" + username + " ---");
         if (username == null || password == null) return "json".equals(format) ? "json" : INPUT;
 
         try {

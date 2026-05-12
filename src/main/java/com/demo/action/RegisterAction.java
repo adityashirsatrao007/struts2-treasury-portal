@@ -11,20 +11,21 @@ public class RegisterAction extends ActionSupport {
     private final AuthenticationService authService = new AuthenticationService();
 
     public String execute() {
+        String format = org.apache.struts2.ServletActionContext.getRequest().getParameter("format");
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             addActionError("Username and Password are required!");
-            return ERROR;
+            return "json".equals(format) ? "json" : ERROR;
         }
 
         try {
             authService.register(username, password, role);
-            return SUCCESS;
+            return "json".equals(format) ? "json" : SUCCESS;
         } catch (IllegalArgumentException e) {
             addActionError(e.getMessage());
-            return ERROR;
+            return "json".equals(format) ? "json" : ERROR;
         } catch (Exception e) {
             addActionError("Registration failed: " + e.getMessage());
-            return ERROR;
+            return "json".equals(format) ? "json" : ERROR;
         }
     }
 

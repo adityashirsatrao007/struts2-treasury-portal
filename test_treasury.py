@@ -21,7 +21,8 @@ def test_register(username, password):
     print(f"--- Registering User: {username} ---")
     payload = {
         "username": username,
-        "password": password
+        "password": password,
+        "format": "json"
     }
     response = SESSION.post(f"{BASE_URL}/register.action", data=payload)
     if response.status_code == 200:
