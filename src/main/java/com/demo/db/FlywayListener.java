@@ -20,7 +20,7 @@ public class FlywayListener implements ServletContextListener {
         
         try {
             // In a real app, load these from application.properties
-            String url = "jdbc:h2:./testdb;AUTO_SERVER=TRUE";
+            String url = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
             String user = "sa";
             String password = "";
 
