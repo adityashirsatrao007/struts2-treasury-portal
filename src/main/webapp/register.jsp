@@ -26,9 +26,22 @@
 <body>
     <div class="card">
         <h1>Join Us</h1>
+        <style>
+            select {
+                width: 100%; padding: 12px; margin-bottom: 1.2rem;
+                background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+                border-radius: 8px; color: #fff; font-size: 1rem; outline: none;
+                appearance: none;
+            }
+            select option { background: #16213e; color: #fff; }
+        </style>
         <form action="register.action" method="post">
             <input type="text" name="username" placeholder="Choose Username" required />
             <input type="password" name="password" placeholder="Choose Password" required />
+            <select name="role" required>
+                <option value="MAKER">Maker (Initiator)</option>
+                <option value="CHECKER">Checker (Approver)</option>
+            </select>
             <input type="submit" value="Register Now" />
         </form>
         <p style="margin-top: 1rem; font-size: 0.8rem; color: #8b949e;">

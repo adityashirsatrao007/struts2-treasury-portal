@@ -40,6 +40,7 @@ public class LoginAction extends ActionSupport {
                 // Verify the hashed password
                 if (BCrypt.checkpw(password, user.getPassword())) {
                     ServletActionContext.getContext().getSession().put("user", username);
+                    ServletActionContext.getContext().getSession().put("role", user.getRole());
                     apiSuccess = true;
                     apiMessage = "Login successful";
                     return "json".equals(format) ? "json" : SUCCESS;

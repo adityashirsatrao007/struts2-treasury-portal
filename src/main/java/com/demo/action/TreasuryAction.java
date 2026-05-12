@@ -29,6 +29,7 @@ public class TreasuryAction extends ActionSupport {
     private String toAccount;
     private double amount;
     private int transferId;
+    private String currentUserRole;
     
     // JSON response fields
     private boolean apiSuccess;
@@ -37,6 +38,7 @@ public class TreasuryAction extends ActionSupport {
     @Action("/treasury")
     public String execute() {
         String format = ServletActionContext.getRequest().getParameter("format");
+        currentUserRole = (String) ServletActionContext.getContext().getSession().get("role");
         loadData();
         return "json".equals(format) ? "json" : SUCCESS;
     }
@@ -155,6 +157,8 @@ public class TreasuryAction extends ActionSupport {
     public void setAmount(double amount) { this.amount = amount; }
     public int getTransferId() { return transferId; }
     public void setTransferId(int transferId) { this.transferId = transferId; }
+    public String getCurrentUserRole() { return currentUserRole; }
+    public void setCurrentUserRole(String role) { this.currentUserRole = role; }
     public boolean isApiSuccess() { return apiSuccess; }
     public String getApiMessage() { return apiMessage; }
 }

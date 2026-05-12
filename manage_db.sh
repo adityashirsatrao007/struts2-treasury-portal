@@ -21,11 +21,12 @@ if [ "$1" == "seed" ]; then
         INSERT INTO accounts (account_number, account_name, balance) VALUES ('ACC-JPMC-002', 'Strategic Reserve Account', 5000000.00);
         INSERT INTO accounts (account_number, account_name, balance) VALUES ('ACC-JPMC-003', 'Payroll Account', 250000.00);
         
-        INSERT INTO users (username, password, role) VALUES ('admin', '\$2a\$10\$8.UnVuG9shgYdfiS.r6zK.qj/S/p3A.HlZ6p.R.e.P/q.q.q.q.q.q.', 'CHECKER');
+        -- Password for all is 'password123'
         INSERT INTO users (username, password, role) VALUES ('maker1', '\$2a\$10\$8.UnVuG9shgYdfiS.r6zK.qj/S/p3A.HlZ6p.R.e.P/q.q.q.q.q.q.', 'MAKER');
+        INSERT INTO users (username, password, role) VALUES ('checker1', '\$2a\$10\$8.UnVuG9shgYdfiS.r6zK.qj/S/p3A.HlZ6p.R.e.P/q.q.q.q.q.q.', 'CHECKER');
+        INSERT INTO users (username, password, role) VALUES ('admin', '\$2a\$10\$8.UnVuG9shgYdfiS.r6zK.qj/S/p3A.HlZ6p.R.e.P/q.q.q.q.q.q.', 'CHECKER');
 
         INSERT INTO audit_logs (username, action, details) VALUES ('System', 'INITIALIZATION', 'Treasury System Environment Ready');
-        INSERT INTO audit_logs (username, action, details) VALUES ('admin', 'LOGIN', 'Successful administrative login from secure terminal');
     "
     echo "--- JPMC SEEDING COMPLETE ---"
 elif [ "$1" == "view" ]; then

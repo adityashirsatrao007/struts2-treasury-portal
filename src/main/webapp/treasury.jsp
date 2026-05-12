@@ -37,7 +37,7 @@
             <h1 style="font-size: 1.5rem;">J.P. Morgan <span style="font-weight: 300; color: #aaa;">| Treasury Portal</span></h1>
         </div>
         <div>
-            <span>Welcome, <strong><s:property value="#session.user" /></strong></span> | 
+            <span>Welcome, <strong><s:property value="#session.user" /></strong> (<s:property value="currentUserRole" />)</span> | 
             <a href="logout.action" class="logout">Secure Logout</a>
         </div>
     </header>
@@ -77,8 +77,8 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
             <!-- Initiate Transfer (Maker) -->
-            <div class="card">
-                <h2>Initiate Fund Transfer</h2>
+            <div class="card" <s:if test="currentUserRole != 'MAKER'">style="opacity: 0.6; pointer-events: none;"</s:if>>
+                <h2>Initiate Fund Transfer <s:if test="currentUserRole != 'MAKER'"><span style="font-size: 0.8rem; color: var(--danger);">(Maker Only)</span></s:if></h2>
                 <form action="initiateTransfer" method="post">
                     <div class="form-group">
                         <label>From Account</label>
@@ -96,7 +96,7 @@
                         <label>Amount (USD)</label>
                         <input type="number" name="amount" step="0.01" min="1" placeholder="0.00" required />
                     </div>
-                    <button type="submit" class="btn btn-primary">Initiate Maker Request</button>
+                    <button type="submit" class="btn btn-primary" <s:if test="currentUserRole != 'MAKER'">disabled</s:if>>Initiate Maker Request</button>
                 </form>
             </div>
 
@@ -113,7 +113,9 @@
                                 <th>ID</th>
                                 <th>Amount</th>
                                 <th>Initiator</th>
-                                <th>Action</th>
+                                <s:if test="currentUserRole == 'CHECKER'">
+                                    <th>Action</th>
+                                </s:if>
                             </tr>
                         </thead>
                         <tbody>
@@ -122,12 +124,14 @@
                                     <td>#<s:property value="id" /></td>
                                     <td>$ <s:property value="amount" /></td>
                                     <td><s:property value="initiator" /></td>
-                                    <td>
-                                        <form action="approveTransfer" method="post" style="display:inline;">
-                                            <input type="hidden" name="transferId" value="<s:property value='id' />" />
-                                            <button type="submit" class="btn btn-success" style="padding: 5px 10px; font-size: 0.8rem;">Approve</button>
-                                        </form>
-                                    </td>
+                                    <s:if test="currentUserRole == 'CHECKER'">
+                                        <td>
+                                            <form action="approveTransfer" method="post" style="display:inline;">
+                                                <input type="hidden" name="transferId" value="<s:property value='id' />" />
+                                                <button type="submit" class="btn btn-success" style="padding: 5px 10px; font-size: 0.8rem;">Approve</button>
+                                            </form>
+                                        </td>
+                                    </s:if>
                                 </tr>
                             </s:iterator>
                         </tbody>

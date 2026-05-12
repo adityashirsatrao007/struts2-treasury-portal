@@ -18,6 +18,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class RegisterAction extends ActionSupport {
     private String username;
     private String password;
+    private String role;
 
     @Action("/register")
     public String execute() {
@@ -33,7 +34,7 @@ public class RegisterAction extends ActionSupport {
             // Hash the password
             String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
             
-            User user = new User(username, hashedPassword, "MAKER");
+            User user = new User(username, hashedPassword, role != null ? role : "MAKER");
             session.persist(user);
             
             transaction.commit();
@@ -49,4 +50,6 @@ public class RegisterAction extends ActionSupport {
     public void setUsername(String username) { this.username = username; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }
