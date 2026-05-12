@@ -3,17 +3,7 @@ package com.demo.action;
 import com.demo.service.TreasuryService;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.ServletActionContext;
-import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.convention.annotation.ParentPackage;
-import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.convention.annotation.Results;
 
-@ParentPackage("auth-default")
-@Results({
-    @Result(name = "success", type = "redirect", location = "treasury.action"),
-    @Result(name = "error", location = "/treasury.jsp"),
-    @Result(name = "json", type = "json")
-})
 public class TransferAction extends ActionSupport {
     private String fromAccount;
     private String toAccount;
@@ -24,7 +14,6 @@ public class TransferAction extends ActionSupport {
 
     private final TreasuryService treasuryService = new TreasuryService();
 
-    @Action("/initiateTransfer")
     public String execute() {
         format = ServletActionContext.getRequest().getParameter("format");
         String username = (String) ServletActionContext.getContext().getSession().get("user");

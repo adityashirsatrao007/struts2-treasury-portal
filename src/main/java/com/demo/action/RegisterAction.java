@@ -2,19 +2,7 @@ package com.demo.action;
 
 import com.demo.service.AuthenticationService;
 import com.opensymphony.xwork2.ActionSupport;
-import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.convention.annotation.InterceptorRef;
-import org.apache.struts2.convention.annotation.ParentPackage;
-import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.convention.annotation.Results;
 
-@ParentPackage("public")
-@InterceptorRef("publicStack")
-@Results({
-    @Result(name = "success", type = "redirect", location = "login.jsp"),
-    @Result(name = "input", location = "/register.jsp"),
-    @Result(name = "error", location = "/register.jsp")
-})
 public class RegisterAction extends ActionSupport {
     private String username;
     private String password;
@@ -22,7 +10,6 @@ public class RegisterAction extends ActionSupport {
 
     private final AuthenticationService authService = new AuthenticationService();
 
-    @Action("/register")
     public String execute() {
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
             addActionError("Username and Password are required!");

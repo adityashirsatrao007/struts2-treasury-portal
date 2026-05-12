@@ -35,9 +35,14 @@ public class HibernateUtil {
         try {
             // Render DATABASE_URL is usually: postgres://user:pass@host:port/db
             URI dbUri = new URI(databaseUrl);
-            String username = dbUri.getUserInfo().split(":")[0];
-            String password = dbUri.getUserInfo().split(":")[1];
-            String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
+            String userInfo = dbUri.getUserInfo();
+            String username = userInfo.contains(":") ? userInfo.split(":")[0] : userInfo;
+            String password = userInfo.contains(":") ? userInfo.split(":")[1] : "";
+            
+            int port = dbUri.getPort();
+            if (port == -1) port = 5432; // Default Postgres port
+            
+            String dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + port + dbUri.getPath();
 
             props.setProperty("hibernate.connection.url", dbUrl);
             props.setProperty("hibernate.connection.username", username);
@@ -53,6 +58,7 @@ public class HibernateUtil {
             
         } catch (Exception e) {
             System.err.println("Error parsing DATABASE_URL: " + e.getMessage());
+            e.printStackTrace();
         }
         return props;
     }

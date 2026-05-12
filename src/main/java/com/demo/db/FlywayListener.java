@@ -22,9 +22,14 @@ public class FlywayListener implements ServletContextListener {
             if (databaseUrl != null && !databaseUrl.isEmpty()) {
                 System.out.println("--- Flyway: Using Postgres (DATABASE_URL) ---");
                 URI dbUri = new URI(databaseUrl);
-                user = dbUri.getUserInfo().split(":")[0];
-                password = dbUri.getUserInfo().split(":")[1];
-                url = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
+                String userInfo = dbUri.getUserInfo();
+                user = userInfo.contains(":") ? userInfo.split(":")[0] : userInfo;
+                password = userInfo.contains(":") ? userInfo.split(":")[1] : "";
+                
+                int port = dbUri.getPort();
+                if (port == -1) port = 5432;
+                
+                url = "jdbc:postgresql://" + dbUri.getHost() + ":" + port + dbUri.getPath();
             }
 
             Flyway flyway = Flyway.configure()

@@ -51,17 +51,21 @@
         
         <action name="login" class="com.demo.action.LoginAction">
             <result name="success" type="redirect">treasury.action</result>
-            <result name="input">/login.jsp</result>
-            <result name="error">/login.jsp</result>
+            <result name="input">/WEB-INF/content/login.jsp</result>
+            <result name="error">/WEB-INF/content/login.jsp</result>
         </action>
         
         <action name="logout" class="com.demo.action.LoginAction" method="logout">
-            <result name="success">/login.jsp</result>
+            <result name="success">/WEB-INF/content/login.jsp</result>
         </action>
 
         <action name="register" class="com.demo.action.RegisterAction">
             <result name="success" type="redirect">login.action</result>
-            <result name="input">/register.jsp</result>
+            <result name="input">/WEB-INF/content/register.jsp</result>
+        </action>
+        
+        <action name="index">
+            <result type="redirect">login.action</result>
         </action>
     </package>
 
@@ -70,18 +74,18 @@
         <default-interceptor-ref name="authStack"/>
         
         <action name="treasury" class="com.demo.action.TreasuryAction">
-            <result name="success">/treasury.jsp</result>
+            <result name="success">/WEB-INF/content/treasury.jsp</result>
             <result name="json" type="json"></result>
         </action>
         
         <action name="initiateTransfer" class="com.demo.action.TransferAction">
             <result name="success" type="redirect">treasury.action</result>
-            <result name="error">/treasury.jsp</result>
+            <result name="error">/WEB-INF/content/treasury.jsp</result>
         </action>
         
         <action name="approveTransfer" class="com.demo.action.ApprovalAction">
             <result name="success" type="redirect">treasury.action</result>
-            <result name="error">/treasury.jsp</result>
+            <result name="error">/WEB-INF/content/treasury.jsp</result>
         </action>
     </package>
 </struts>

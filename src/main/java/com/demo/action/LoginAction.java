@@ -4,20 +4,7 @@ import com.demo.model.User;
 import com.demo.service.AuthenticationService;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.ServletActionContext;
-import org.apache.struts2.convention.annotation.Action;
-import org.apache.struts2.convention.annotation.InterceptorRef;
-import org.apache.struts2.convention.annotation.ParentPackage;
-import org.apache.struts2.convention.annotation.Result;
-import org.apache.struts2.convention.annotation.Results;
 
-@ParentPackage("public")
-@InterceptorRef("publicStack")
-@Results({
-    @Result(name = "success", type = "redirect", location = "treasury.action"),
-    @Result(name = "input", location = "/login.jsp"),
-    @Result(name = "error", location = "/login.jsp"),
-    @Result(name = "json", type = "json")
-})
 public class LoginAction extends ActionSupport {
     private String username;
     private String password;
@@ -28,7 +15,7 @@ public class LoginAction extends ActionSupport {
 
     private final AuthenticationService authService = new AuthenticationService();
 
-    @Action("/login")
+    @Override
     public String execute() {
         String format = ServletActionContext.getRequest().getParameter("format");
         if (username == null || password == null) return "json".equals(format) ? "json" : INPUT;
@@ -55,10 +42,9 @@ public class LoginAction extends ActionSupport {
         }
     }
 
-    @Action("/logout")
     public String logout() {
         ServletActionContext.getContext().getSession().clear();
-        return INPUT;
+        return SUCCESS;
     }
 
     public String getUsername() { return username; }
