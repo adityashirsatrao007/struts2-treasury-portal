@@ -12,14 +12,14 @@ A high-availability, enterprise-grade financial management system designed for i
 ## 📖 Table of Contents
 1.  [🔍 Abstract](#-1-abstract)
 2.  [💻 Technology Stack](#-2-technology-stack)
-3.  [🗺️ Flow Diagrams & Working](#-3-flow-diagrams--working)
-4.  [⚙️ Implementation & Logic](#-4-implementation--logic)
-5.  [🚀 Setup & Installation](#-5-setup--installation)
-6.  [🖼️ Output & Screenshots](#-6-output--screenshots)
-7.  [📱 Scan to View GitHub](#-7-scan-to-view-github)
-8.  [🌟 Key Features](#-8-key-features)
-9.  [🛠️ Troubleshooting & Support](#-9-troubleshooting--support)
-10. [📄 License & Author](#-10-license--author)
+3.  [🏗️ Infrastructure Architecture](#-3-infrastructure-architecture)
+4.  [🗺️ System Workflows](#-4-system-workflows)
+5.  [🛡️ Security Model](#-5-security-model)
+6.  [⚙️ Implementation & Logic](#-6-implementation--logic)
+7.  [🚀 Setup & Installation](#-7-setup--installation)
+8.  [🖼️ Output & Screenshots](#-8-output--screenshots)
+9.  [📱 Scan to View GitHub](#-9-scan-to-view-github)
+10. [🌟 Key Features](#-10-key-features)
 
 ---
 
@@ -41,85 +41,47 @@ The project utilizes a modern, decoupled enterprise stack designed for vertical 
 | **Database** | PostgreSQL | 15+ | Relational persistence for financial records |
 | **Migration** | Flyway | 9.x | Version-controlled database schema |
 
-### 🛠️ Tools & Infrastructure
-*   **Integrated Development Environment**: VS Code / IntelliJ IDEA
-*   **Build Automation**: Apache Maven 3.9+
-*   **Containerization**: Docker & Docker Compose
-*   **Web Server**: Apache Tomcat 9 (Servlet 4.0 Container)
-*   **API Auditing**: Python 3.10+ (using Request/Matplotlib libraries)
+---
+
+## 🏗️ 3. Infrastructure Architecture
+The application is designed for cloud-native deployment using Docker and can be hosted on platforms like Render or Hugging Face.
+
+![Infrastructure Flow](docs/assets/infra_flow.png)
 
 ---
 
-## 🗺️ 3. Flow Diagrams & Working
+## 🗺️ 4. System Workflows
 
-### 3.1 System Architecture Diagram
-This diagram illustrates the multi-layered component stack from the infrastructure up to the presentation layer.
+### 4.1 System Component Interaction
+The portal is built on a multi-layered decoupled architecture, ensuring that the infrastructure, server, and application logic remain independent and scalable.
 
-```mermaid
-graph TD
-    subgraph "Infrastructure Layer"
-        A[Docker Container] --> B[Tomcat 9 Server]
-    end
-    subgraph "Application Framework"
-        B --> C[Struts 2 Filter Dispatcher]
-        C --> D[OGNL Value Stack]
-    end
-    subgraph "Business Logic & Persistence"
-        D --> E[JPMC Action Layer]
-        E --> F[Hibernate Service]
-        F --> G[(PostgreSQL / H2)]
-    end
-```
+![Architecture Stack](docs/assets/arch_stack.png)
 
-### 3.2 User Workflow (Maker-Checker Lifecycle)
-Visualizes the dual-authorization process required for all financial movements.
+### 4.2 Maker-Checker Sequential Logic
+The interaction between system participants follows a rigid sequence of events to maintain financial compliance.
 
-```mermaid
-sequenceDiagram
-    participant M as Maker (Staff)
-    participant S as System (Portal)
-    participant C as Checker (Manager)
-    
-    M->>S: Initiate Transfer ($10k)
-    S-->>S: Record PENDING State
-    S-->>S: Create Forensic Audit Entry
-    S->>C: Alert: Approval Required
-    C->>S: Review Transaction Queue
-    C->>S: Grant Approval
-    S-->>S: Update DB (Atomic Commit)
-    S->>M: Success: Transfer Dispatched
-```
+![Sequence Flow](docs/assets/sequence_flow.png)
 
-### 3.3 Request-Response Cycle
-The internal path of an HTTP request through the security interceptor stack.
+### 4.3 Financial Transaction State Machine
+The lifecycle of a fund transfer from initiation to final commitment.
 
-```mermaid
-graph LR
-    Req[HTTPS Request] --> F[FilterDispatcher]
-    F --> I1[HibernateSession Interceptor]
-    I1 --> I2[Auth Interceptor]
-    I2 --> I3[Audit Interceptor]
-    I3 --> Act[JPMC Action]
-    Act --> Res[Result: JSP/JSON]
-    Res --> Resp[HTTPS Response]
-```
-
-### 3.4 Data Flow Diagram (DFD)
-Shows how data is persisted and audited across the system.
-
-```mermaid
-flowchart LR
-    UI[Web UI] -- "Data" --> Controller[Struts Controller]
-    Controller -- "Object" --> Service[Treasury Service]
-    Service -- "Entity" --> Hibernate[Hibernate O/RM]
-    Hibernate -- "SQL" --> DB[(PostgreSQL)]
-    Controller -- "Metadata" --> Auditor[Audit Logger]
-    Auditor -- "Log" --> DB
-```
+![State Flow](docs/assets/state_flow.png)
 
 ---
 
-## ⚙️ 4. Implementation & Logic
+## 🛡️ 5. Security Model
+
+### 5.1 Deep-Security Request Lifecycle
+Every transaction follows a strictly audited path from the browser to the database commit.
+
+![Security Flow](docs/assets/security_flow.png)
+
+### 5.2 Forensic Activity Tracking
+The portal implements an immutable audit trail, ensuring that every request metadata is captured and stored in a tamper-evident database table.
+
+---
+
+## ⚙️ 6. Implementation & Logic
 
 ### 🏛️ Architectural Pattern
 The system is built on a **Modular MVC (Model-View-Controller)** pattern.
@@ -128,14 +90,11 @@ The system is built on a **Modular MVC (Model-View-Controller)** pattern.
 *   **Controller**: Action classes that orchestrate the transition between UI events and business services.
 
 ### 🛡️ Core Logic: The Interceptor Pipeline
-The "secret sauce" of the portal is the **Interceptor Stack**. Instead of writing repetitive security code in every page, we use a chain of decorators:
-1.  **Session-per-Request**: The `HibernateSessionInterceptor` opens a database connection at the start of the request and closes it only after the view is rendered (Open-Session-In-View pattern).
-2.  **Role Guard**: The `AuthenticationInterceptor` inspects the HTTP session to ensure the user has the correct role (Maker vs. Checker) before allowing access to specific financial methods.
-3.  **Atomic Auditing**: The `AuditInterceptor` uses AOP (Aspect Oriented Programming) to capture the "Before" and "After" state of a transaction, ensuring that every money movement is documented even if the database commit fails.
+The portal utilizes a custom Interceptor Stack configured in `struts.xml` to enforce role-based access control. The **AuthenticationInterceptor** ensures that only authorized users access financial functions, while the **AuditInterceptor** captures forensic metadata before and after action execution.
 
 ---
 
-## 🚀 5. Setup & Installation
+## 🚀 7. Setup & Installation
 
 ### 📋 Prerequisites
 *   Java Development Kit (JDK) 21
@@ -148,70 +107,37 @@ The "secret sauce" of the portal is the **Interceptor Stack**. Instead of writin
     git clone https://github.com/adityashirsatrao007/struts2-treasury-portal.git
     cd struts2-treasury-portal
     ```
-2.  **Build the Project**:
+2.  **Build & Run**:
     ```bash
-    mvn clean compile
+    mvn clean compile tomcat7:run -Dmaven.test.skip=true
     ```
-3.  **Run with Tomcat**:
-    ```bash
-    mvn tomcat7:run -Dmaven.test.skip=true
-    ```
-4.  **Access the Portal**:
+3.  **Access the Portal**:
     Open [http://localhost:8080](http://localhost:8080) in your browser.
 
-### 🐳 Docker Setup
-```bash
-docker build -t treasury-portal .
-docker run -p 8080:8080 treasury-portal
-```
-
 ---
 
-## 🖼️ 6. Output & Screenshots
+## 🖼️ 8. Output & Screenshots
 
-### 🖥️ 6.1 Authentication Layer
-The login interface uses BCrypt hashing to verify credentials against the PostgreSQL database. Users are assigned roles (Maker/Checker) during the handshake.
-
+### 🖥️ 8.1 Authentication Layer
 ![Login Page](docs/assets/screenshot_login.png)
 
-### 🖥️ 6.2 Liquidity Dashboard
-A real-time view of all corporate accounts. This page utilizes Hibernate's lazy-loading to fetch balances only when needed, optimizing server performance.
-
+### 🖥️ 8.2 Liquidity Dashboard
 ![Dashboard Page](docs/assets/screenshot_dashboard.png)
-
-### 🖥️ 6.3 Forensic Activity Feed
-The audit log provides a tamper-evident record of all system interactions, including timestamps, IP addresses, and action outcomes.
-
-![Audit Logs](docs/assets/security_flow.png)
 
 ---
 
-## 📱 7. Scan to View GitHub
+## 📱 9. Scan to View GitHub
 
 ### **📱 Scan to view project on GitHub**
-To view the full source code, forensic documentation, and technical diagrams, please scan the QR code below:
-
 ![GitHub QR Code](docs/assets/github_qr.png)
 
 ---
 
-## 🌟 8. Key Features
-*   **Dual-Authorization**: Mandatory Maker-Checker workflow for all fund movements.
-*   **ACID Compliance**: Full transaction integrity using Hibernate transaction management.
-*   **API Hardening**: Supports `format=json` on all endpoints for external auditing tools.
-*   **Database Versioning**: Flyway-managed schema migrations for seamless environment synchronization.
-*   **Responsive UI**: Modern CSS3 dashboard compatible with tablet and desktop views.
-
-## 🛠️ 9. Troubleshooting & Support
-*   **Problem**: Database connection error on startup.
-    *   **Solution**: Ensure PostgreSQL is running or use the default H2 in-memory configuration in `hibernate.cfg.xml`.
-*   **Problem**: Session timeout error.
-    *   **Solution**: The session is configured for 15 minutes of inactivity in `web.xml`. Please re-login.
-
-## 📄 10. License & Author
-*   **Author**: [Aditya Shirsatrao]
-*   **Email**: [Your Email]
-*   **License**: MIT License - see the [LICENSE](LICENSE) file for details.
+## 🌟 10. Key Features
+*   **Dual-Authorization**: Mandatory Maker-Checker workflow.
+*   **ACID Compliance**: Transaction integrity using Hibernate.
+*   **API Hardening**: JSON support for automated auditing.
+*   **Forensic Auditing**: Tamper-evident activity logs.
 
 ---
-*Developed for the JPMC Advanced Agentic Coding Certification.*
+*Created for the JPMC Advanced Agentic Coding Certification.*
