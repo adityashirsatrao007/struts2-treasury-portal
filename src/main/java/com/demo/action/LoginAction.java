@@ -1,7 +1,7 @@
 package com.demo.action;
 
-import com.demo.db.HibernateUtil;
 import com.demo.model.User;
+import com.demo.service.AuthenticationService;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
@@ -9,8 +9,6 @@ import org.apache.struts2.convention.annotation.InterceptorRef;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
-import org.hibernate.Session;
-import org.mindrot.jbcrypt.BCrypt;
 
 @ParentPackage("public")
 @InterceptorRef("publicStack")
@@ -28,23 +26,21 @@ public class LoginAction extends ActionSupport {
     private boolean apiSuccess;
     private String apiMessage;
 
+    private final AuthenticationService authService = new AuthenticationService();
+
     @Action("/login")
     public String execute() {
         String format = ServletActionContext.getRequest().getParameter("format");
         if (username == null || password == null) return "json".equals(format) ? "json" : INPUT;
 
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            User user = session.get(User.class, username);
-
+        try {
+            User user = authService.authenticate(username, password);
             if (user != null) {
-                // Verify the hashed password
-                if (com.demo.security.PasswordUtils.verifyPassword(password, user.getPassword())) {
-                    ServletActionContext.getContext().getSession().put("user", username);
-                    ServletActionContext.getContext().getSession().put("role", user.getRole());
-                    apiSuccess = true;
-                    apiMessage = "Login successful";
-                    return "json".equals(format) ? "json" : SUCCESS;
-                }
+                ServletActionContext.getContext().getSession().put("user", username);
+                ServletActionContext.getContext().getSession().put("role", user.getRole());
+                apiSuccess = true;
+                apiMessage = "Login successful";
+                return "json".equals(format) ? "json" : SUCCESS;
             }
             
             apiSuccess = false;
@@ -53,7 +49,7 @@ public class LoginAction extends ActionSupport {
             return "json".equals(format) ? "json" : ERROR;
         } catch (Exception e) {
             apiSuccess = false;
-            apiMessage = "Database error: " + e.getMessage();
+            apiMessage = "System error: " + e.getMessage();
             addActionError(apiMessage);
             return "json".equals(format) ? "json" : ERROR;
         }

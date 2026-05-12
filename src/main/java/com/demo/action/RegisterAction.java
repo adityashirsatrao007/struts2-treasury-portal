@@ -1,16 +1,12 @@
 package com.demo.action;
 
-import com.demo.db.HibernateUtil;
-import com.demo.model.User;
+import com.demo.service.AuthenticationService;
 import com.opensymphony.xwork2.ActionSupport;
 import org.apache.struts2.convention.annotation.Action;
+import org.apache.struts2.convention.annotation.InterceptorRef;
+import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.mindrot.jbcrypt.BCrypt;
-import org.apache.struts2.convention.annotation.ParentPackage;
-import org.apache.struts2.convention.annotation.InterceptorRef;
 
 @ParentPackage("public")
 @InterceptorRef("publicStack")
@@ -24,6 +20,8 @@ public class RegisterAction extends ActionSupport {
     private String password;
     private String role;
 
+    private final AuthenticationService authService = new AuthenticationService();
+
     @Action("/register")
     public String execute() {
         if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
@@ -31,27 +29,14 @@ public class RegisterAction extends ActionSupport {
             return ERROR;
         }
 
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            
-            // Validate Strength
-            if (!com.demo.security.PasswordUtils.isStrong(password)) {
-                addActionError("Password must be 12+ chars, include Uppercase, Lowercase, Number, and Special Character!");
-                return ERROR;
-            }
-
-            // Hash the password
-            String hashedPassword = com.demo.security.PasswordUtils.hashPassword(password);
-            
-            User user = new User(username, hashedPassword, role != null ? role : "MAKER");
-            session.persist(user);
-            
-            transaction.commit();
+        try {
+            authService.register(username, password, role);
             return SUCCESS;
+        } catch (IllegalArgumentException e) {
+            addActionError(e.getMessage());
+            return ERROR;
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
-            addActionError("User already exists or database error!");
+            addActionError("Registration failed: " + e.getMessage());
             return ERROR;
         }
     }
