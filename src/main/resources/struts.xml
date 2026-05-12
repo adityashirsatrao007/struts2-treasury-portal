@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE struts PUBLIC
-    "-//Apache Software Foundation//DTD Struts Configuration 2.5//EN"
-    "http://struts.apache.org/dtds/struts-2.5.dtd">
+    "-//Apache Software Foundation//DTD Struts Configuration 6.0//EN"
+    "http://struts.apache.org/dtds/struts-6.0.dtd">
 
 <struts>
     <constant name="struts.devMode" value="true" />
     <constant name="struts.ui.theme" value="simple" />
     <constant name="struts.convention.action.packages" value="com.demo.action" />
+    <constant name="struts.action.extension" value="action,," />
+    <constant name="struts.enable.DynamicMethodInvocation" value="false" />
 
     <!-- Base Package for Interceptors -->
     <package name="base" extends="json-default" abstract="true">
@@ -46,10 +48,40 @@
     <!-- Public Actions (Login/Register) -->
     <package name="public" extends="base" namespace="/">
         <default-interceptor-ref name="publicStack"/>
+        
+        <action name="login" class="com.demo.action.LoginAction">
+            <result name="success" type="redirect">treasury.action</result>
+            <result name="input">/login.jsp</result>
+            <result name="error">/login.jsp</result>
+        </action>
+        
+        <action name="logout" class="com.demo.action.LoginAction" method="logout">
+            <result name="success">/login.jsp</result>
+        </action>
+
+        <action name="register" class="com.demo.action.RegisterAction">
+            <result name="success" type="redirect">login.action</result>
+            <result name="input">/register.jsp</result>
+        </action>
     </package>
 
     <!-- Secure Actions (Treasury/Transfers) -->
     <package name="auth-default" extends="base" namespace="/">
         <default-interceptor-ref name="authStack"/>
+        
+        <action name="treasury" class="com.demo.action.TreasuryAction">
+            <result name="success">/treasury.jsp</result>
+            <result name="json" type="json"></result>
+        </action>
+        
+        <action name="initiateTransfer" class="com.demo.action.TransferAction">
+            <result name="success" type="redirect">treasury.action</result>
+            <result name="error">/treasury.jsp</result>
+        </action>
+        
+        <action name="approveTransfer" class="com.demo.action.ApprovalAction">
+            <result name="success" type="redirect">treasury.action</result>
+            <result name="error">/treasury.jsp</result>
+        </action>
     </package>
 </struts>
