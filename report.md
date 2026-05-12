@@ -1,37 +1,46 @@
-# 🏛️ JPMC Treasury Portal: Architectural Whitepaper
+# 🏦 JPMC Treasury Portal: Final Project Report
 
 ## 1. Abstract
-The **JPMC Treasury Portal** is a high-availability enterprise financial system built to manage global corporate liquidity. It utilizes the **Apache Struts 2** MVC framework combined with **Hibernate 6** ORM to provide a secure, transactional, and audited environment for mission-critical money movement.
+The **JPMC Treasury Portal** is a high-availability enterprise financial system designed to manage global corporate liquidity and high-value transfers. This project solves the critical problem of internal fraud and operational error by implementing a strict **Maker-Checker (Dual-Authorization)** workflow. The final output is a secure, web-based platform that provides real-time visibility into account balances, pending authorizations, and a complete forensic audit trail for institutional compliance.
 
-## 2. System Architecture (The Component Stack)
-The portal is built on a multi-layered decoupled architecture, ensuring that the infrastructure, server, and application logic remain independent and scalable.
+## 2. Technology Used
+*   **Programming Language**: Java 21 (JDK 21)
+*   **Framework**: Apache Struts 2.6 (MVC Architecture)
+*   **O/RM Layer**: Hibernate 6.2 (JPA Compliance)
+*   **Tools / Software**: VS Code, Maven, Docker, Tomcat 9
+*   **Database**: PostgreSQL (Production) / H2 (Development)
+*   **Automation**: Python 3.10+ (API Auditing & Data Viz)
 
-![Architecture Stack](arch_stack.png)
+## 3. Flow Diagram / Working
+The portal follows a centralized request-response cycle where all routing is managed by the Struts 2 Filter Dispatcher.
 
-### 2.1 The Server Layer: Apache Tomcat 9
-The application runs on **Apache Tomcat 9**, a high-performance Servlet 4.0 container. Tomcat handles the low-level HTTP lifecycle, thread pooling, and JSP compilation, providing a stable foundation for the Struts 2 dispatcher.
+```mermaid
+graph TD
+    A[HTTP Request] --> B[Struts 2 Filter Dispatcher]
+    B --> C[Interceptor Stack: Auth & Audit]
+    C --> D[Action Layer: JPMC Logic]
+    D --> E[Hibernate: Database Transaction]
+    E --> F[Result: Dynamic JSP / JSON]
+    F --> G[HTTP Response]
+```
 
-### 2.2 The Framework Layer: Struts 2.6
-We use **Struts 2.6** (Zero-XML style) for routing. The **FilterDispatcher** intercepts every incoming request and directs it through a chain of **Interceptors** (Authentication, Logging, Hibernate Session) before the core Action executes.
+## 4. Implementation
+The project is built on a modular decoupled architecture using the **Model-View-Controller (MVC)** pattern. The key implementation steps involved configuring a custom Interceptor Stack in `struts.xml` to enforce role-based access control (Maker vs. Checker). Hibernate was utilized to manage atomic financial transactions, ensuring that no balance is updated without a corresponding audit entry. The frontend was developed using Struts Tags and CSS3 for a premium, responsive dashboard experience.
 
-## 3. Infrastructure & Deployment Topology
-The system is designed for **Cloud-Native** execution using Docker, allowing for "Write Once, Run Anywhere" stability.
+## 5. Output Screenshot
+Below are the live captures of the portal in operation:
 
-![Infrastructure Flow](infra_flow.png)
+### 5.1 Portal Entry (Login)
+![Login Screenshot](docs/assets/screenshot_login.png)
 
-*   **Runtime**: OpenJDK 21 (Long Term Support).
-*   **Deployment**: Multi-stage Docker build, optimizing for a small footprint and high security.
-*   **Database**: PostgreSQL 15+ (Production) / H2 (In-memory testing).
+### 5.2 Liquidity Dashboard
+![Dashboard Screenshot](docs/assets/screenshot_dashboard.png)
 
-## 4. Deep-Security request Lifecycle
-Every transaction follows a strictly audited path from the browser to the database commit.
+## 6. QR Code for GitHub Link
+Scan the QR code below to view the full source code, forensic documentation, and technical diagrams on GitHub.
 
-![Security Flow](security_flow.png)
-
-## 5. Implementation Logic
-*   **O/RM Mapping**: Hibernate manages the conversion of Java objects (Users, Accounts) into SQL rows.
-*   **State Management**: We use a **Maker-Checker** workflow. Transactions are initiated in a `PENDING` state and require a secondary signature for commitment.
-*   **Forensic Auditing**: Every request metadata is captured by the `AuditInterceptor` and stored in a tamper-evident log table.
+### **Scan to view project/demo**
+![GitHub QR Code](docs/assets/github_qr.png)
 
 ---
-*Developed for the JPMC Advanced Agentic Coding Certification.*
+*Created for the JPMC Advanced Agentic Coding Certification.*
