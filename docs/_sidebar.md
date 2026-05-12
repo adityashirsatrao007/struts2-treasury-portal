@@ -1,6 +1,0 @@
-- [🏦 Home](README.md)
-- [🏛️ Architecture](architecture.md)
-- [🛡️ Security Model](security.md)
-- [📈 Financial Workflows](workflows.md)
-- [🔌 API Reference](api.md)
-- [🎓 Interview Prep](interview.md)
