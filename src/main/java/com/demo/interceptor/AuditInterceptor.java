@@ -27,14 +27,11 @@ public class AuditInterceptor extends AbstractInterceptor {
     }
 
     private void logAction(String username, String action, String details) {
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
+        try {
+            Session session = HibernateUtil.getCurrentSession();
             AuditLog log = new AuditLog(username, action, details);
             session.persist(log);
-            transaction.commit();
         } catch (Exception e) {
-            if (transaction != null) transaction.rollback();
             e.printStackTrace();
         }
     }

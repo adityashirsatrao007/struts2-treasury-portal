@@ -13,8 +13,10 @@
             <interceptor name="auth" class="com.demo.interceptor.AuthenticationInterceptor"/>
             <interceptor name="audit" class="com.demo.interceptor.AuditInterceptor"/>
             <interceptor name="securityHeaders" class="com.demo.interceptor.SecurityHeadersInterceptor"/>
+            <interceptor name="hibernateSession" class="com.demo.interceptor.HibernateSessionInterceptor"/>
             
             <interceptor-stack name="authStack">
+                <interceptor-ref name="hibernateSession"/>
                 <interceptor-ref name="securityHeaders"/>
                 <interceptor-ref name="audit"/>
                 <interceptor-ref name="auth"/>
@@ -22,6 +24,7 @@
             </interceptor-stack>
 
             <interceptor-stack name="publicStack">
+                <interceptor-ref name="hibernateSession"/>
                 <interceptor-ref name="securityHeaders"/>
                 <interceptor-ref name="defaultStack"/>
             </interceptor-stack>

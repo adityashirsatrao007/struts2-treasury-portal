@@ -9,4 +9,13 @@ services:
         value: 8080
       - key: STRUTS_DEV_MODE
         value: "true"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: struts2-db
+          property: connectionString
     healthCheckPath: /login.jsp
+
+databases:
+  - name: struts2-db
+    plan: free
+    region: ohio
